@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interfaces\ISuppressionListCheckService.cs" />
+    <Compile Include="Interfaces\IThirdPartyBounceService.cs" />
     <Compile Include="Models\EspEnum.cs" />
     <Compile Include="Models\SuppressedEmailViewModel.cs" />
     <Compile Include="Models\ThirdParty\Mailgun\Bounce.cs" />

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.Models
+﻿namespace Core.Models
 {
     /// <summary>
     /// Provides a listing of all configurable Email Service Providers.

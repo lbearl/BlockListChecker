@@ -1,4 +1,5 @@
-﻿using Core.Models;
+﻿using Core.Interfaces;
+using Core.Models;
 using Core.Models.ThirdParty.Mailgun;
 using RestSharp;
 using RestSharp.Authenticators;
@@ -8,8 +9,45 @@ using System.Collections.Generic;
 
 namespace Infrastructure.Services.ThirdParty
 {
-    internal class MailgunService
+    internal class MailgunService : IThirdPartyBounceService
     {
+        private readonly string MAILGUN_API_KEY; //TODO get this from appconfig or other file.
+        private readonly string MAILGUN_DOMAIN_NAME; //TODO get this from appconfig or other file.
+        public MailgunService()
+        {
+            MAILGUN_API_KEY = "TODO";
+            MAILGUN_DOMAIN_NAME = "TODO";
+        }
+
+        public SuppressedEmailViewModel GetBounce(string address)
+        {
+            RestClient client = new RestClient();
+            client.BaseUrl = new Uri("https://api.mailgun.net/v3");
+            client.Authenticator =
+              new HttpBasicAuthenticator("api",
+                                         MAILGUN_API_KEY); 
+            RestRequest request = new RestRequest();
+            request.AddParameter("domain",
+                                 "YOUR_DOMAIN_NAME", ParameterType.UrlSegment); 
+            request.AddParameter("limit", 10000); // requesting first 10,000 bounces sorted by ABC.
+            request.Resource = $"{{domain}}/bounces/{address}";
+
+            var response = client.Execute(request);
+
+            var deserializer = new JsonDeserializer();
+
+            var result = deserializer.Deserialize<Bounce>(response);
+
+            return new SuppressedEmailViewModel
+                {
+                    AddedOn = result.CreatedAt,
+                    EmailAddress = result.Address,
+                    ErrorCode = result.Code,
+                    ErrorText = result.Error,
+                    EmailServiceProvider = EspEnum.MAILGUN
+                };
+        }
+
         /// <summary>
         /// Retrieves the first 10,000 bounces (in lexicographical order) from mailgun.
         /// </summary>
@@ -20,10 +58,10 @@ namespace Infrastructure.Services.ThirdParty
             client.BaseUrl = new Uri("https://api.mailgun.net/v3");
             client.Authenticator =
               new HttpBasicAuthenticator("api",
-                                         "YOUR_API_KEY");
+                                         MAILGUN_API_KEY);
             RestRequest request = new RestRequest();
             request.AddParameter("domain",
-                                 "YOUR_DOMAIN_NAME", ParameterType.UrlSegment);
+                                 MAILGUN_DOMAIN_NAME, ParameterType.UrlSegment);
             request.AddParameter("limit", 10000); // requesting first 10,000 bounces sorted by ABC.
             request.Resource = "{domain}/bounces";
 
@@ -49,7 +87,6 @@ namespace Infrastructure.Services.ThirdParty
             }
 
             return retList;
-
         }
     }
 }
