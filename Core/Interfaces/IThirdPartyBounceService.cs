@@ -12,7 +12,7 @@ namespace Core.Interfaces
         /// Get all bounces.
         /// </summary>
         /// <returns>A list of all bounces for the given ESP.</returns>
-        List<SuppressedEmailViewModel> GetBounces();
+        IEnumerable<SuppressedEmailViewModel> GetBounces();
 
         /// <summary>
         /// Get an entry for a single address

@@ -52,7 +52,7 @@ namespace Infrastructure.Services.ThirdParty
         /// Retrieves the first 10,000 bounces (in lexicographical order) from mailgun.
         /// </summary>
         /// <returns>A list of <see cref="SuppressedEmailViewModel"/>s for the bounced email addresses.</returns>
-        public List<SuppressedEmailViewModel> GetBounces()
+        public IEnumerable<SuppressedEmailViewModel> GetBounces()
         {
             RestClient client = new RestClient();
             client.BaseUrl = new Uri("https://api.mailgun.net/v3");
@@ -71,22 +71,18 @@ namespace Infrastructure.Services.ThirdParty
 
             var result = deserializer.Deserialize<BounceList>(response);
 
-            var retList = new List<SuppressedEmailViewModel>();
-
             //iterate over all of the bounces and add them to the list.
             foreach(var bounce in result.Items)
             {
-                retList.Add(new SuppressedEmailViewModel
+               yield return new SuppressedEmailViewModel
                 {
                     AddedOn = bounce.CreatedAt,
                     EmailAddress = bounce.Address,
                     ErrorCode = bounce.Code,
                     ErrorText = bounce.Error,
                     EmailServiceProvider = EspEnum.MAILGUN
-                });
+                };
             }
-
-            return retList;
         }
     }
 }
