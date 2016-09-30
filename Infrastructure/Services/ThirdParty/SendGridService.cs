@@ -6,21 +6,32 @@ using RestSharp;
 using RestSharp.Deserializers;
 using Core.Models.ThirdParty.SendGrid;
 using System.Linq;
+using System.Configuration;
 
 namespace Infrastructure.Services.ThirdParty
 {
+    /// <summary>
+    /// The SendGrid specific bounce checking implementation.
+    /// </summary>
     public class SendGridService : IThirdPartyBounceService
     {
         private readonly string SENDGRID_API_KEY;
+
+        /// <summary>
+        /// Constructs a new SendGridService.
+        /// </summary>
         public SendGridService()
         {
-            SENDGRID_API_KEY = "TODO";
+            SENDGRID_API_KEY = ConfigurationManager.AppSettings["SendGridApiKey"];
         }
 
-        public SuppressedEmailViewModel GetBounce(string address)
+        /// <summary>
+        /// Get SendGrid bounces. Should return an IEnumerable of 0 or 1 elements.
+        /// </summary>
+        /// <param name="address">The address to test for.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of 0 or 1 <see cref="SuppressedEmailViewModel"/>s.</returns>
+        public IEnumerable<SuppressedEmailViewModel> GetBounce(string address)
         {
-            //https://api.sendgrid.com/v3/suppression/bounces/{email}
-            //GET https://api.sendgrid.com/v3/suppression/bounces
             RestClient client = new RestClient();
             client.BaseUrl = new Uri("https://api.sendgrid.com/v3");
             
@@ -36,7 +47,7 @@ namespace Infrastructure.Services.ThirdParty
             // per API docs, sendgrid returns a list of 1 element
             var result = deserializer.Deserialize<List<Bounce>>(response).FirstOrDefault();
 
-            return new SuppressedEmailViewModel
+            yield return new SuppressedEmailViewModel
             {
                 AddedOn = DateTimeOffset.FromUnixTimeSeconds(int.Parse(result.Created)).LocalDateTime,
                 EmailAddress = result.Email,
@@ -46,6 +57,10 @@ namespace Infrastructure.Services.ThirdParty
             };
         }
 
+        /// <summary>
+        /// Get SendGrid bounces. Should return an IEnumerable of all bounces.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerable{T}"/> of all <see cref="SuppressedEmailViewModel"/>s.</returns>
         public IEnumerable<SuppressedEmailViewModel> GetBounces()
         {
             RestClient client = new RestClient();
@@ -66,14 +81,15 @@ namespace Infrastructure.Services.ThirdParty
 
             foreach (var bounce in result)
             {
-                yield return new SuppressedEmailViewModel
-                {
-                    AddedOn = DateTimeOffset.FromUnixTimeSeconds(int.Parse(bounce.Created)).LocalDateTime,
-                    EmailAddress = bounce.Email,
-                    ErrorCode = bounce.Status,
-                    ErrorText = bounce.Reason,
-                    EmailServiceProvider = EspEnum.SENDGRID
-                };
+                if(!string.IsNullOrEmpty(bounce.Created))
+                    yield return new SuppressedEmailViewModel
+                    {
+                        AddedOn = DateTimeOffset.FromUnixTimeSeconds(int.Parse(bounce.Created)).LocalDateTime,
+                        EmailAddress = bounce.Email,
+                        ErrorCode = bounce.Status,
+                        ErrorText = bounce.Reason,
+                        EmailServiceProvider = EspEnum.SENDGRID
+                    };
             }
         }
     }

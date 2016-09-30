@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Infrastructure.Services.ThirdParty
 {
-    internal class MailgunService : IThirdPartyBounceService
+    public class MailgunService : IThirdPartyBounceService
     {
         private readonly string MAILGUN_API_KEY; //TODO get this from appconfig or other file.
         private readonly string MAILGUN_DOMAIN_NAME; //TODO get this from appconfig or other file.
@@ -19,7 +19,7 @@ namespace Infrastructure.Services.ThirdParty
             MAILGUN_DOMAIN_NAME = "TODO";
         }
 
-        public SuppressedEmailViewModel GetBounce(string address)
+        public IEnumerable<SuppressedEmailViewModel> GetBounce(string address)
         {
             RestClient client = new RestClient();
             client.BaseUrl = new Uri("https://api.mailgun.net/v3");
@@ -38,7 +38,7 @@ namespace Infrastructure.Services.ThirdParty
 
             var result = deserializer.Deserialize<Bounce>(response);
 
-            return new SuppressedEmailViewModel
+            yield return new SuppressedEmailViewModel
                 {
                     AddedOn = result.CreatedAt,
                     EmailAddress = result.Address,

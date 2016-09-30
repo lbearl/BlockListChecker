@@ -18,6 +18,7 @@
 namespace BlockListChecker.DependencyResolution {
     using Core.Interfaces;
     using Infrastructure.Services;
+    using Infrastructure.Services.ThirdParty;
     using StructureMap;
     using StructureMap.Configuration.DSL;
     using StructureMap.Graph;
@@ -34,7 +35,12 @@ namespace BlockListChecker.DependencyResolution {
                     scan.WithDefaultConventions();
 					scan.With(new ControllerConvention());
                 });
-            //For<IExample>().Use<Example>();
+            For<IThirdPartyBounceService>().Use<CompositeBounceCheckerService>()
+                .EnumerableOf<IThirdPartyBounceService>().Contains(x =>
+                {
+                    x.Type<SendGridService>();
+                    x.Type<MailgunService>();
+                });
         }
 
         #endregion

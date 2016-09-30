@@ -19,6 +19,6 @@ namespace Core.Interfaces
         /// </summary>
         /// <param name="address">The email address to test.</param>
         /// <returns>A single bounce for a single address at a single ESP.</returns>
-        SuppressedEmailViewModel GetBounce(string address);
+        IEnumerable<SuppressedEmailViewModel> GetBounce(string address);
     }
 }

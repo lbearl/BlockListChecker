@@ -3,38 +3,30 @@ using Core.Models;
 using Infrastructure.Services.ThirdParty;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Infrastructure.Services
 {
     public class SuppressionListCheckService : ISuppressionListCheckService
     {
-        private readonly IThirdPartyBounceService _mailgunService;
-        private readonly IThirdPartyBounceService _sendGridService;
+        private readonly IThirdPartyBounceService _service;
 
-        public SuppressionListCheckService(IThirdPartyBounceService mailgunService, IThirdPartyBounceService sendGridService)
+        public SuppressionListCheckService(IThirdPartyBounceService composedService)
         {
-            _mailgunService = mailgunService;
-            _sendGridService = sendGridService;
+            _service = composedService;
         }
+
         public List<SuppressedEmailViewModel> GetAllSuppressedEmails()
         {
-            var retList = new List<SuppressedEmailViewModel>();
-
-            retList.AddRange(_mailgunService.GetBounces());
-            retList.AddRange(_sendGridService.GetBounces());
+            
             //TODO - add additional ESPs.
 
-            return retList;
+            return _service.GetBounces().ToList();
         }
 
         public List<SuppressedEmailViewModel> GetSuppressedEmail(string address)
         {
-            var retList = new List<SuppressedEmailViewModel>();
-
-            retList.Add(_mailgunService.GetBounce(address));
-            retList.Add(_sendGridService.GetBounce(address));
-
-            return retList;
+            return _service.GetBounce(address).ToList();
         }
 
     }
