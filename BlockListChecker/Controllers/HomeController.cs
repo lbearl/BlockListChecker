@@ -1,30 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using BlockListChecker.ViewModels;
+using System;
 using System.Web.Mvc;
 
 namespace BlockListChecker.Controllers
 {
     public class HomeController : Controller
     {
+        [Route]
         public ActionResult Index()
         {
             return View();
         }
 
-        public ActionResult About()
+        [Route("single")]
+        public ActionResult Single(string emailAddress)
         {
-            ViewBag.Message = "Your application description page.";
+            if (string.IsNullOrEmpty(emailAddress))
+                throw new ArgumentException(nameof(emailAddress));
 
-            return View();
-        }
+            var vm = new SingleEmailViewModel
+            {
+                EmailAddress = emailAddress
+            };
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
+            return View(vm);
 
-            return View();
         }
     }
 }

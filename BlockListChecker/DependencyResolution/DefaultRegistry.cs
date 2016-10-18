@@ -15,13 +15,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace BlockListChecker.DependencyResolution {
+namespace BlockListChecker.DependencyResolution
+{
     using Core.Interfaces;
     using Infrastructure.Services;
     using Infrastructure.Services.ThirdParty;
     using StructureMap;
-    using StructureMap.Configuration.DSL;
-    using StructureMap.Graph;
 
     public class DefaultRegistry : Registry {
         #region Constructors and Destructors

@@ -1,7 +1,5 @@
 ﻿using Core.Interfaces;
 using Core.Models;
-using Infrastructure.Services.ThirdParty;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,9 +16,6 @@ namespace Infrastructure.Services
 
         public List<SuppressedEmailViewModel> GetAllSuppressedEmails()
         {
-            
-            //TODO - add additional ESPs.
-
             return _service.GetBounces().ToList();
         }
 
