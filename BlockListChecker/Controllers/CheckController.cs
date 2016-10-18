@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace BlockListChecker.Controllers
 {
+    [RoutePrefix("Check")]
     public class CheckController : Controller
     {
         private ISuppressionListCheckService _checkService;
@@ -25,17 +26,17 @@ namespace BlockListChecker.Controllers
         /// <returns>A JSON list of suppressed email addresses.</returns>
         [HttpGet]
         [Route("GetSuppressions")]
-        public IEnumerable<SuppressedEmailViewModel> GetSuppressions()
+        public JsonResult GetSuppressions()
         {
-            return _checkService.GetAllSuppressedEmails();
+            return Json(_checkService.GetAllSuppressedEmails(), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
-        [Route("GetSuppression/{address}")]
-        public IEnumerable<SuppressedEmailViewModel> GetSuppression(string address)
+        [Route("GetSuppression")]
+        public JsonResult GetSuppression(string address)
         {
             if (string.IsNullOrEmpty(address)) throw new ArgumentException($"{nameof(address)} cannot be null or empty");
-            return _checkService.GetSuppressedEmail(address);
+            return Json(_checkService.GetSuppressedEmail(address), JsonRequestBehavior.AllowGet);
         }
     }
 }

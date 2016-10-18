@@ -10,6 +10,6 @@ namespace Core.Models.ThirdParty.Mailgun
 
         public string Error { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public string CreatedAt { get; set; }
     }
 }

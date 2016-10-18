@@ -25,8 +25,15 @@
                 var d = $.Deferred();
 
                 $.ajax({
-                    url: "/Check/GetSuppressions/@Model.EmailAddress",
-                    dataType: "json"
+                    type: 'GET',
+                    url: "/Check/GetSuppression?address=@Model.EmailAddress",
+                    dataType: "json",
+                    success: function (data) {
+                        d.resolve(data);
+                    },
+                    error: function(e){
+                        alert("ERROR:" + e.responseText)
+                    }
                 }).done(function (response) {
                     d.resolve(response.value);
                 });
@@ -36,11 +43,11 @@
         },
 
         fields: [
-            { name: "Email Provider", type: "text", width: 150},
-            { name: "Email Address", type: "text", width: 150 },
-            { name: "Added On", type: "datetime", width: 200 },
-            { name: "Error Code", type: "text", width: 75 },
-            { name: "Error Text", type: "text", width: 270 },
+            { name: "EmailServiceProviderName", title: "ESP", type: "textarea", width: 75 },
+            { name: "EmailAddress", title: "Address", type: "text", width: 250 },
+            { name: "AddedOnDisplay", title: "Added", type: "datetime", width: 200 },
+            { name: "ErrorCode", title: "Code", type: "text", width: 75 },
+            { name: "ErrorText", title: "Error", type: "text", width: 270 },
             { type: "control" }
         ]
     });

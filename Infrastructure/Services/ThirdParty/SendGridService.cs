@@ -22,7 +22,7 @@ namespace Infrastructure.Services.ThirdParty
         /// </summary>
         public SendGridService()
         {
-            SENDGRID_API_KEY = ConfigurationManager.AppSettings["SendGridApiKey"];
+            SENDGRID_API_KEY = ConfigurationManager.AppSettings["SendGridAPI"];
         }
 
         /// <summary>
@@ -47,14 +47,29 @@ namespace Infrastructure.Services.ThirdParty
             // per API docs, sendgrid returns a list of 1 element
             var result = deserializer.Deserialize<List<Bounce>>(response).FirstOrDefault();
 
-            yield return new SuppressedEmailViewModel
+            if (!string.IsNullOrEmpty(result.Email))
             {
-                AddedOn = DateTimeOffset.FromUnixTimeSeconds(int.Parse(result.Created)).LocalDateTime,
-                EmailAddress = result.Email,
-                ErrorCode = result.Status,
-                ErrorText = result.Reason,
-                EmailServiceProvider = EspEnum.SENDGRID
-            };
+
+                yield return new SuppressedEmailViewModel
+                {
+                    AddedOn = DateTimeOffset.FromUnixTimeSeconds(int.Parse(result.Created)).LocalDateTime,
+                    EmailAddress = result.Email,
+                    ErrorCode = result.Status,
+                    ErrorText = result.Reason,
+                    EmailServiceProvider = EspEnum.SENDGRID
+                };
+            }
+            else
+            {
+                yield return new SuppressedEmailViewModel
+                {
+                    AddedOn = DateTime.Now,
+                    EmailAddress = "unknown",
+                    ErrorCode = "Internal",
+                    ErrorText = "Error getting results from ESP",
+                    EmailServiceProvider = EspEnum.SENDGRID
+                };
+            }
         }
 
         /// <summary>

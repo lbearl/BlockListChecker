@@ -6,17 +6,19 @@ using RestSharp.Authenticators;
 using RestSharp.Deserializers;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace Infrastructure.Services.ThirdParty
 {
     public class MailgunService : IThirdPartyBounceService
     {
-        private readonly string MAILGUN_API_KEY; //TODO get this from appconfig or other file.
-        private readonly string MAILGUN_DOMAIN_NAME; //TODO get this from appconfig or other file.
+        private readonly string MAILGUN_API_KEY;
+        private readonly string MAILGUN_DOMAIN_NAME;
+
         public MailgunService()
         {
-            MAILGUN_API_KEY = "TODO";
-            MAILGUN_DOMAIN_NAME = "TODO";
+            MAILGUN_API_KEY = ConfigurationManager.AppSettings["MailgunAPI"];
+            MAILGUN_DOMAIN_NAME = ConfigurationManager.AppSettings["MailgunDomain"];
         }
 
         public IEnumerable<SuppressedEmailViewModel> GetBounce(string address)
@@ -28,7 +30,7 @@ namespace Infrastructure.Services.ThirdParty
                                          MAILGUN_API_KEY); 
             RestRequest request = new RestRequest();
             request.AddParameter("domain",
-                                 "YOUR_DOMAIN_NAME", ParameterType.UrlSegment); 
+                                 MAILGUN_DOMAIN_NAME, ParameterType.UrlSegment); 
             request.AddParameter("limit", 10000); // requesting first 10,000 bounces sorted by ABC.
             request.Resource = $"{{domain}}/bounces/{address}";
 
@@ -38,12 +40,24 @@ namespace Infrastructure.Services.ThirdParty
 
             var result = deserializer.Deserialize<Bounce>(response);
 
-            yield return new SuppressedEmailViewModel
+            if (!string.IsNullOrEmpty(result.Address))
+                yield return new SuppressedEmailViewModel
                 {
-                    AddedOn = result.CreatedAt,
+                    // .net doesn't seem to have a nice way to parse RFC 2822 datetimes with UTC timezone
+                    // so just strip it off.
+                    AddedOn = DateTime.Parse(result.CreatedAt.Substring(0, 26)),
                     EmailAddress = result.Address,
                     ErrorCode = result.Code,
                     ErrorText = result.Error,
+                    EmailServiceProvider = EspEnum.MAILGUN
+                };
+            else
+                yield return new SuppressedEmailViewModel
+                {
+                    AddedOn = DateTime.Now,
+                    EmailAddress = "unknown",
+                    ErrorCode = "Internal",
+                    ErrorText = "Error getting results from ESP",
                     EmailServiceProvider = EspEnum.MAILGUN
                 };
         }
@@ -76,7 +90,7 @@ namespace Infrastructure.Services.ThirdParty
             {
                yield return new SuppressedEmailViewModel
                 {
-                    AddedOn = bounce.CreatedAt,
+                    AddedOn = DateTime.Parse(bounce.CreatedAt),
                     EmailAddress = bounce.Address,
                     ErrorCode = bounce.Code,
                     ErrorText = bounce.Error,
