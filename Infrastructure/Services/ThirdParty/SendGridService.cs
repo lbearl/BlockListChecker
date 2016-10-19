@@ -32,6 +32,10 @@ namespace Infrastructure.Services.ThirdParty
         /// <returns>An <see cref="IEnumerable{T}"/> of 0 or 1 <see cref="SuppressedEmailViewModel"/>s.</returns>
         public IEnumerable<SuppressedEmailViewModel> GetBounce(string address)
         {
+            // return nothing if not configured.
+            if (string.IsNullOrEmpty(SENDGRID_API_KEY))
+                yield return null;
+
             RestClient client = new RestClient();
             client.BaseUrl = new Uri("https://api.sendgrid.com/v3");
             

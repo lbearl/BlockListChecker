@@ -16,6 +16,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastru
 		{E2A0B52B-B5B0-44D1-A17B-C5C12BDE61A3} = {E2A0B52B-B5B0-44D1-A17B-C5C12BDE61A3}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Tests", "Infrastructure.Tests\Infrastructure.Tests.csproj", "{8BDE352D-06AB-4C90-8ECD-D9843F900C74}"
+	ProjectSection(ProjectDependencies) = postProject
+		{31AD5A14-3F35-4A34-8B81-794F7316E896} = {31AD5A14-3F35-4A34-8B81-794F7316E896}
+		{3D90C09A-79BC-496F-9470-F7E2111A1DC5} = {3D90C09A-79BC-496F-9470-F7E2111A1DC5}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +40,10 @@ Global
 		{3D90C09A-79BC-496F-9470-F7E2111A1DC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D90C09A-79BC-496F-9470-F7E2111A1DC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D90C09A-79BC-496F-9470-F7E2111A1DC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BDE352D-06AB-4C90-8ECD-D9843F900C74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BDE352D-06AB-4C90-8ECD-D9843F900C74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BDE352D-06AB-4C90-8ECD-D9843F900C74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BDE352D-06AB-4C90-8ECD-D9843F900C74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

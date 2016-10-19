@@ -27,6 +27,9 @@ namespace Infrastructure.Services
 
         public IEnumerable<SuppressedEmailViewModel> GetBounce(string address)
         {
+            if (string.IsNullOrEmpty(address))
+                throw new ArgumentException(nameof(address));
+
             var retList = new List<SuppressedEmailViewModel>();
 
             foreach (var svc in _bounceService)

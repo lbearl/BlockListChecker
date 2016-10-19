@@ -23,6 +23,9 @@ namespace Infrastructure.Services.ThirdParty
 
         public IEnumerable<SuppressedEmailViewModel> GetBounce(string address)
         {
+            // return nothing if not configured.
+            if (string.IsNullOrEmpty(MAILGUN_API_KEY) || string.IsNullOrEmpty(MAILGUN_DOMAIN_NAME))
+                yield return null;
             RestClient client = new RestClient();
             client.BaseUrl = new Uri("https://api.mailgun.net/v3");
             client.Authenticator =
